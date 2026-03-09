@@ -294,4 +294,3 @@ export const ImageWithBottomTitle = (props: PromoProps): JSX.Element => {
     </section>
   );
 };
-

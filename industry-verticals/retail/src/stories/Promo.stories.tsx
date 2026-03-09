@@ -182,9 +182,6 @@ export const ImageWithBottomTitlePromo: Story = {
       styles: promoStyles,
     };
 
-    return (
-      <ImageWithBottomTitle params={params} rendering={baseRendering} fields={baseFields} />
-    );
+    return <ImageWithBottomTitle params={params} rendering={baseRendering} fields={baseFields} />;
   },
 };
-
