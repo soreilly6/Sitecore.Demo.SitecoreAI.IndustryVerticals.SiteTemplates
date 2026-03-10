@@ -143,8 +143,8 @@ export const Default = ({ params, fields, rendering }: ASHeroProps) => {
           <div
             className="pointer-events-none absolute hidden lg:block"
             style={{
-              height: '800px',
-              width: '500px',
+              height: '900px',
+              width: '400px',
               background: diagonalOverlayColor,
               left: '-270px',
               top: '-250px',
@@ -159,7 +159,7 @@ export const Default = ({ params, fields, rendering }: ASHeroProps) => {
           <div
             className="pointer-events-none absolute hidden lg:block"
             style={{
-              height: '800px',
+              height: '900px',
               width: '500px',
               background: mainBackgroundColor,
               left: '-270px',
@@ -193,14 +193,14 @@ export const WithPlaceholder = ({ params, fields, rendering }: ASHeroProps) => {
     <ASHeroCommon params={params} fields={fields} rendering={rendering}>
       {/* Left: content area with solid background */}
       <div
-        className="relative z-10 flex w-full flex-1 flex-col justify-center px-6 py-10 md:px-8 md:py-12 lg:w-1/2 lg:pr-12 lg:pl-16"
+        className="relative z-10 flex w-full flex-1 flex-col justify-center px-6 py-10 md:px-8 md:py-12 lg:w-2/5 lg:pr-10 lg:pl-16"
         style={{ backgroundColor: mainBackgroundColor }}
       >
         <Placeholder name={phKey} rendering={rendering} />
       </div>
 
       {/* Right: image with diagonal overlay shapes */}
-      <div className="relative z-0 flex w-full flex-1 shrink-0 lg:h-full lg:w-1/2">
+      <div className="relative z-0 flex w-full flex-1 shrink-0 lg:h-full lg:w-3/5">
         <div className="relative aspect-[4/3] w-full overflow-hidden lg:aspect-auto lg:h-full">
           {/* Back darker diagonal */}
           <div
