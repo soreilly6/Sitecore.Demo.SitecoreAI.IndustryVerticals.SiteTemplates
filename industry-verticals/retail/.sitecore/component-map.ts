@@ -46,6 +46,7 @@ import * as Header from 'src/components/header/Header';
 import * as Footer from 'src/components/footer/Footer';
 import * as Features from 'src/components/features/Features';
 import * as ContentBlock from 'src/components/content-block/ContentBlock';
+import * as HeaderContainer from 'src/components/container/Header-Container';
 import * as Container from 'src/components/container/Container';
 import * as Accordion from 'src/components/container/Accordion';
 import * as ContactForm from 'src/components/contact-form/ContactForm';
@@ -102,6 +103,7 @@ export const componentMap = new Map<string, NextjsContentSdkComponent>([
   ['Footer', { ...Footer }],
   ['Features', { ...Features }],
   ['ContentBlock', { ...ContentBlock }],
+  ['Header-Container', { ...HeaderContainer }],
   ['Container', { ...Container }],
   ['Accordion', { ...Accordion }],
   ['ContactForm', { ...ContactForm, componentType: 'client' }],
