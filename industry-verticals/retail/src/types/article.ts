@@ -25,5 +25,7 @@ export type Category = SitecoreItem<CategoryFields>;
 
 export interface AuthorFields {
   AuthorName: Field<string>;
+  About?: Field<string>;
+  Avatar?: ImageField;
 }
 export type Author = SitecoreItem<AuthorFields>;

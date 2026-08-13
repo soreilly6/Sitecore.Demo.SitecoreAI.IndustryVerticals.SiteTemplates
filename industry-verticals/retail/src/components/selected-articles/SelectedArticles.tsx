@@ -2,6 +2,7 @@
 
 import { ComponentProps } from '@/lib/component-props';
 import {
+  DateField,
   Field,
   LinkField,
   Link as ContentSskLink,
@@ -10,6 +11,7 @@ import {
   RichText as ContentSdkRichText,
   Text,
 } from '@sitecore-content-sdk/nextjs';
+import { articleShortDateFormatter } from '@/helpers/dateHelper';
 import AccentLine from '@/assets/icons/accent-line/AccentLine';
 import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
@@ -30,6 +32,8 @@ interface Fields {
 export type CarouselProps = ComponentProps & {
   fields: Fields;
 };
+
+const MAX_GRID_LIST_ARTICLES = 8;
 
 export const Default = (props: CarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -247,6 +251,151 @@ export const Default = (props: CarouselProps) => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const GridList = (props: CarouselProps) => {
+  const id = props.params.RenderingIdentifier;
+  const articles = (props.fields?.Articles || []).slice(0, MAX_GRID_LIST_ARTICLES);
+  const hideAccentLine = props.params.styles?.includes(CommonStyles.HideAccentLine);
+
+  return (
+    <section className={`${props.params.styles} py-20`} id={id ? id : undefined}>
+      <div className="container">
+        <h2 className="inline-block">
+          <Text field={props.fields.Title} />
+          {!hideAccentLine && <AccentLine className="w-full max-w-xs" />}
+        </h2>
+
+        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+          {articles.map((article) => (
+            <Link key={article.id} href={article.url} className="group block">
+              <div className="overflow-hidden rounded-lg">
+                <ContentSdkImage
+                  field={article.fields.Image}
+                  className="aspect-square h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+
+              <h6 className="group-hover:text-accent mt-5 line-clamp-3 wrap-anywhere">
+                <Text editable={false} field={article.fields.Title} />
+              </h6>
+
+              {article.fields.PublishedDate?.value && (
+                <DateField
+                  tag="p"
+                  editable={false}
+                  className="text-foreground-muted mt-3 text-xs tracking-widest uppercase"
+                  field={article.fields.PublishedDate}
+                  render={articleShortDateFormatter}
+                />
+              )}
+            </Link>
+          ))}
+        </div>
+
+        {props.fields.ExploreLink?.value?.href && (
+          <ContentSskLink
+            field={props.fields.ExploreLink}
+            className="arrow-btn mt-12 inline-flex"
+          />
+        )}
+      </div>
+    </section>
+  );
+};
+
+export const LargeThumbnail = (props: CarouselProps) => {
+  const id = props.params.RenderingIdentifier;
+  const articles = props.fields?.Articles || [];
+  const swiperRef = useRef<SwiperClass | null>(null);
+
+  return (
+    <section className={`${props.params.styles} py-20`} id={id ? id : undefined}>
+      <div className="container">
+        <div className="flex items-center justify-between gap-6">
+          <h6 className="tracking-widest uppercase">
+            <Text field={props.fields.Title} />
+          </h6>
+
+          {articles.length > 1 && (
+            <div className="flex items-center gap-3">
+              <button
+                className="bg-foreground text-background flex size-10 items-center justify-center rounded-full"
+                name="previous-article"
+                aria-label="Previous article"
+                onClick={() => swiperRef.current?.slidePrev()}
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                className="bg-foreground text-background flex size-10 items-center justify-center rounded-full"
+                name="next-article"
+                aria-label="Next article"
+                onClick={() => swiperRef.current?.slideNext()}
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-8">
+          <Swiper
+            modules={[Autoplay]}
+            slidesPerView={1.1}
+            spaceBetween={20}
+            autoplay={false}
+            breakpoints={{
+              768: { slidesPerView: 1.6 },
+              1024: { slidesPerView: 2.3 },
+            }}
+            onSwiper={(swiper) => {
+              swiperRef.current = swiper;
+            }}
+          >
+            {articles.map((article) => {
+              const authorName = article.fields?.Author?.fields?.AuthorName?.value;
+              const hasPublishedDate = !!article.fields?.PublishedDate?.value;
+
+              return (
+                <SwiperSlide key={article.id}>
+                  <Link href={article.url} className="group block">
+                    <div className="relative overflow-hidden rounded-lg">
+                      <ContentSdkImage
+                        field={article.fields.Image}
+                        className="aspect-16/10 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+
+                      {(authorName || hasPublishedDate) && (
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-5">
+                          <div className="text-background flex items-center gap-2 text-xs tracking-widest uppercase">
+                            {authorName && <span>{authorName}</span>}
+                            {authorName && hasPublishedDate && <span aria-hidden="true">|</span>}
+                            {hasPublishedDate && (
+                              <DateField
+                                tag="span"
+                                editable={false}
+                                field={article.fields.PublishedDate}
+                                render={articleShortDateFormatter}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <h6 className="group-hover:text-accent mt-5 line-clamp-2 wrap-anywhere">
+                      <Text editable={false} field={article.fields.Title} />
+                    </h6>
+                  </Link>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
         </div>
       </div>
     </section>

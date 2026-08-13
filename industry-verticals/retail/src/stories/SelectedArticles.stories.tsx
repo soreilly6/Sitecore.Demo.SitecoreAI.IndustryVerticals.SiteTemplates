@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { CommonParams, CommonRendering } from './common/commonData';
 import {
   Default as SelectedArticles,
+  GridList as SelectedArticlesGridList,
+  LargeThumbnail as SelectedArticlesLargeThumbnail,
   CarouselProps,
 } from '../components/selected-articles/SelectedArticles';
 import { createLinkField, createRichTextField, createTextField } from './helpers/createFields';
@@ -124,5 +126,51 @@ export const Default: Story = {
     // Test 6: Next button should be disabled at the end
     expect(nextButton).toBeDisabled();
     expect(nextButton).toHaveClass('article-carousel-btn-disabled');
+  },
+};
+
+export const GridList: Story = {
+  args: {
+    numberOfArticles: 8,
+  },
+  render: (args) => {
+    const fields = {
+      ...baseFields,
+      Title: createTextField('Perspectives'),
+      Articles: createMockArticles(args.numberOfArticles),
+    };
+
+    const params = {
+      ...baseParams,
+      styles: clsx(
+        baseParams.styles,
+        args.BackgroundColor,
+        args.hideAccentLine && CommonStyles.HideAccentLine
+      ),
+    };
+
+    return <SelectedArticlesGridList params={params} rendering={baseRendering} fields={fields} />;
+  },
+};
+
+export const LargeThumbnail: Story = {
+  args: {
+    numberOfArticles: 4,
+  },
+  render: (args) => {
+    const fields = {
+      ...baseFields,
+      Title: createTextField('Featured Perspectives'),
+      Articles: createMockArticles(args.numberOfArticles),
+    };
+
+    const params = {
+      ...baseParams,
+      styles: clsx(baseParams.styles, args.BackgroundColor),
+    };
+
+    return (
+      <SelectedArticlesLargeThumbnail params={params} rendering={baseRendering} fields={fields} />
+    );
   },
 };
