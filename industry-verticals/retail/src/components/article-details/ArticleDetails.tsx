@@ -25,7 +25,14 @@ interface ArticleDetailsProps extends ComponentProps {
   fields: Fields;
 }
 
-export const Default = ({ params, fields, rendering }: ArticleDetailsProps) => {
+const ArticleDetailsCommon = ({
+  params,
+  fields,
+  rendering,
+  children,
+}: ArticleDetailsProps & {
+  children?: React.ReactNode;
+}) => {
   const { page } = useSitecore();
   const [currentUrl, setCurrentUrl] = useState('');
   const { styles, RenderingIdentifier: id, DynamicPlaceholderId } = params;
@@ -75,9 +82,7 @@ export const Default = ({ params, fields, rendering }: ArticleDetailsProps) => {
               />
             )}
 
-            <div className="col-span-12 aspect-video w-full overflow-hidden rounded-lg lg:col-span-10 lg:col-start-2">
-              <ContentSdkImage field={fields.Image} className="h-full w-full object-cover" />
-            </div>
+            {children}
 
             <div className="col-span-12 mt-8 lg:col-span-8 lg:col-start-3">
               <h2>
@@ -102,4 +107,18 @@ export const Default = ({ params, fields, rendering }: ArticleDetailsProps) => {
       </article>
     </>
   );
+};
+
+export const Default = ({ params, fields, rendering }: ArticleDetailsProps) => {
+  return (
+    <ArticleDetailsCommon params={params} fields={fields} rendering={rendering}>
+      <div className="col-span-12 aspect-video w-full overflow-hidden rounded-lg lg:col-span-10 lg:col-start-2">
+        <ContentSdkImage field={fields?.Image} className="h-full w-full object-cover" />
+      </div>
+    </ArticleDetailsCommon>
+  );
+};
+
+export const NoImage = ({ params, fields, rendering }: ArticleDetailsProps) => {
+  return <ArticleDetailsCommon params={params} fields={fields} rendering={rendering} />;
 };

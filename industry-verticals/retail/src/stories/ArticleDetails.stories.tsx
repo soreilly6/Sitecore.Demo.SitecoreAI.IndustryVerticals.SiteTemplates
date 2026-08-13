@@ -1,6 +1,9 @@
 import { ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { Default as ArticleDetails } from '../components/article-details/ArticleDetails';
+import {
+  Default as ArticleDetails,
+  NoImage as ArticleDetailsNoImage,
+} from '../components/article-details/ArticleDetails';
 import { CommonParams, CommonRendering } from './common/commonData';
 import { renderStorybookPlaceholder } from './helpers/renderStorybookPlaceholder';
 import { createRichTextField, createTextField, createImageField } from './helpers/createFields';
@@ -64,5 +67,16 @@ export const Default: Story = {
     };
 
     return <ArticleDetails params={params} rendering={baseRendering} fields={baseFields} />;
+  },
+};
+
+export const NoImage: Story = {
+  render: (args) => {
+    const params = {
+      ...baseParams,
+      HideShareWidget: boolToSitecoreCheckbox(args.hideShareWidget),
+    };
+
+    return <ArticleDetailsNoImage params={params} rendering={baseRendering} fields={baseFields} />;
   },
 };
