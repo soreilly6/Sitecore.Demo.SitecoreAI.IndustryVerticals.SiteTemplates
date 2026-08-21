@@ -7,9 +7,11 @@ import {
 } from '@sitecore-content-sdk/nextjs/codegen';
 // end of built-in imports
 
-import { Link, Text, useSitecore, RichText, NextImage, DateField, Placeholder, Image as Image_8a80e63291fea86e0744df19113dc44bec187216, CdpHelper, withDatasourceCheck } from '@sitecore-content-sdk/nextjs';
-import { useMemo, useRef, useState, useEffect, useId, useCallback } from 'react';
+import { useState, useMemo, useRef, useEffect, useId, useCallback } from 'react';
 import React from 'react';
+import { NextImage, Text, RichText, useSitecore, Link, DateField, Placeholder, Image as Image_8a80e63291fea86e0744df19113dc44bec187216, CdpHelper, withDatasourceCheck } from '@sitecore-content-sdk/nextjs';
+import { appendQueryParam, resolveVideoSource } from '@/helpers/videoHelpers';
+import { Play, ArrowRight, ChevronLeft, ChevronRight, ChevronDown, Heart, Plus, Star, User, X, Check, Loader2, LoaderCircle, ShoppingCart, Search, Globe, MoreHorizontal, Home, Clock, Share2 } from 'lucide-react';
 import Head from 'next/head';
 import { useI18n } from 'next-localization';
 import { faFacebookF, faInstagram, faLinkedin, faTwitter, faYoutube } from '@fortawesome/free-brands-svg-icons';
@@ -22,7 +24,6 @@ import { CommonStyles, LayoutStyles, PromoFlags, HeroBannerStyles } from '@/type
 import { articleShortDateFormatter, articleDateFormatter } from '@/helpers/dateHelper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation, A11y, Keyboard } from 'swiper/modules';
-import { ArrowRight, ChevronLeft, ChevronRight, ChevronDown, Heart, Plus, Star, User, X, Check, Loader2, LoaderCircle, ShoppingCart, Search, Globe, MoreHorizontal, Home, Clock, Share2 } from 'lucide-react';
 import Link_a258c208ba01265ca0aa9c7abae745cc7141aa63 from 'next/link';
 import { cn } from '@/shadcn/lib/utils';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
@@ -94,13 +95,25 @@ import { sortByDateDesc, getCategoryCounts } from '@/helpers/articleUtils';
 
 const importMap = [
   {
+    module: 'react',
+    exports: [
+      { name: 'useState', value: useState },
+      { name: 'useMemo', value: useMemo },
+      { name: 'useRef', value: useRef },
+      { name: 'useEffect', value: useEffect },
+      { name: 'useId', value: useId },
+      { name: 'useCallback', value: useCallback },
+      { name: 'default', value: React },
+    ]
+  },
+  {
     module: '@sitecore-content-sdk/nextjs',
     exports: [
-      { name: 'Link', value: Link },
-      { name: 'Text', value: Text },
-      { name: 'useSitecore', value: useSitecore },
-      { name: 'RichText', value: RichText },
       { name: 'NextImage', value: NextImage },
+      { name: 'Text', value: Text },
+      { name: 'RichText', value: RichText },
+      { name: 'useSitecore', value: useSitecore },
+      { name: 'Link', value: Link },
       { name: 'DateField', value: DateField },
       { name: 'Placeholder', value: Placeholder },
       { name: 'Image', value: Image_8a80e63291fea86e0744df19113dc44bec187216 },
@@ -109,15 +122,35 @@ const importMap = [
     ]
   },
   {
-    module: 'react',
+    module: '@/helpers/videoHelpers',
     exports: [
-      { name: 'useMemo', value: useMemo },
-      { name: 'useRef', value: useRef },
-      { name: 'useState', value: useState },
-      { name: 'useEffect', value: useEffect },
-      { name: 'useId', value: useId },
-      { name: 'useCallback', value: useCallback },
-      { name: 'default', value: React },
+      { name: 'appendQueryParam', value: appendQueryParam },
+      { name: 'resolveVideoSource', value: resolveVideoSource },
+    ]
+  },
+  {
+    module: 'lucide-react',
+    exports: [
+      { name: 'Play', value: Play },
+      { name: 'ArrowRight', value: ArrowRight },
+      { name: 'ChevronLeft', value: ChevronLeft },
+      { name: 'ChevronRight', value: ChevronRight },
+      { name: 'ChevronDown', value: ChevronDown },
+      { name: 'Heart', value: Heart },
+      { name: 'Plus', value: Plus },
+      { name: 'Star', value: Star },
+      { name: 'User', value: User },
+      { name: 'X', value: X },
+      { name: 'Check', value: Check },
+      { name: 'Loader2', value: Loader2 },
+      { name: 'LoaderCircle', value: LoaderCircle },
+      { name: 'ShoppingCart', value: ShoppingCart },
+      { name: 'Search', value: Search },
+      { name: 'Globe', value: Globe },
+      { name: 'MoreHorizontal', value: MoreHorizontal },
+      { name: 'Home', value: Home },
+      { name: 'Clock', value: Clock },
+      { name: 'Share2', value: Share2 },
     ]
   },
   {
@@ -207,30 +240,6 @@ const importMap = [
       { name: 'Navigation', value: Navigation },
       { name: 'A11y', value: A11y },
       { name: 'Keyboard', value: Keyboard },
-    ]
-  },
-  {
-    module: 'lucide-react',
-    exports: [
-      { name: 'ArrowRight', value: ArrowRight },
-      { name: 'ChevronLeft', value: ChevronLeft },
-      { name: 'ChevronRight', value: ChevronRight },
-      { name: 'ChevronDown', value: ChevronDown },
-      { name: 'Heart', value: Heart },
-      { name: 'Plus', value: Plus },
-      { name: 'Star', value: Star },
-      { name: 'User', value: User },
-      { name: 'X', value: X },
-      { name: 'Check', value: Check },
-      { name: 'Loader2', value: Loader2 },
-      { name: 'LoaderCircle', value: LoaderCircle },
-      { name: 'ShoppingCart', value: ShoppingCart },
-      { name: 'Search', value: Search },
-      { name: 'Globe', value: Globe },
-      { name: 'MoreHorizontal', value: MoreHorizontal },
-      { name: 'Home', value: Home },
-      { name: 'Clock', value: Clock },
-      { name: 'Share2', value: Share2 },
     ]
   },
   {

@@ -1,0 +1,19 @@
+---
+ID: "f5a15a02-0e84-4824-a84f-12c4bcdd71a7"
+Parent: "45430424-514e-4c73-b33e-089141c9b9fa"
+Template: "0437fee2-44c9-46a6-abe9-28858d9fee8c"
+Path: "/sitecore/templates/Project/industry-verticals/Components/Forms/Login"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260821T160200Z
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "7f2fa768-f0fd-4e28-807b-921ddbf99889"
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260821T160200Z

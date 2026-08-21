@@ -1,0 +1,19 @@
+---
+ID: "a445500c-c6a9-40e8-bfe5-b2939baed260"
+Parent: "eae27667-a14a-4d6b-97d5-00a484faa22d"
+Template: "49c111d0-6867-4798-a724-1f103166e6e9"
+Path: "/sitecore/content/industry-verticals/forma-lux/Presentation/Headless Variants/Login"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260821T160200Z
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "b20f872c-5fb3-4b3f-affe-432571e55456"
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260821T160200Z

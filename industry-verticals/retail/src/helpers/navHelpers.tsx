@@ -1,6 +1,6 @@
 import { NavigationProps, NavItemFields } from '@/components/navigation/Navigation';
 import React, { JSX } from 'react';
-import { LinkField, Text } from '@sitecore-content-sdk/nextjs';
+import { LinkField } from '@sitecore-content-sdk/nextjs';
 
 export const isNavLevel = (fields: NavItemFields, level: number): boolean => {
   return Array.isArray(fields.Styles) && fields.Styles.includes(`level${level}`);
@@ -13,6 +13,13 @@ export const isNavRootItem = (fields: NavItemFields): boolean => {
   return isNavLevel(fields, 0) && !isFlatLevel;
 };
 
+/**
+ * Label or logo for a nav item. Uses the field value as text so Sitecore Pages
+ * does not inject editing chrome that would mismatch SSR HTML.
+ * @param {NavItemFields} fields - The navigation item fields.
+ * @param {string} [logoSrc] - Optional logo URL for the root item.
+ * @returns {JSX.Element | string} A logo image or the item's title text.
+ */
 export const getLinkContent = (fields: NavItemFields, logoSrc?: string): JSX.Element | string => {
   const isRootItem = isNavRootItem(fields);
 
@@ -22,12 +29,7 @@ export const getLinkContent = (fields: NavItemFields, logoSrc?: string): JSX.Ele
     return <img src={logoSrc} alt={String(altText)} className="h-auto w-36" />;
   }
 
-  const textField = fields.NavigationTitle || fields.Title;
-  if (textField) {
-    return <Text field={textField} />;
-  }
-
-  return fields.DisplayName;
+  return String(fields.NavigationTitle?.value ?? fields.Title?.value ?? fields.DisplayName ?? '');
 };
 
 export const getLinkField = (fields: NavItemFields): LinkField => ({

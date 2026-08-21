@@ -3,6 +3,7 @@ import { expect, waitFor } from 'storybook/test';
 import {
   Default as Navigation,
   VerticalNav as NavigationVertical,
+  Collapsed as NavigationCollapsed,
 } from '../components/navigation/Navigation';
 import { ComponentProps } from 'react';
 import { CommonParams, CommonRendering } from './common/commonData';
@@ -169,5 +170,17 @@ export const Vertical: Story = {
         <NavigationVertical params={baseParams} rendering={baseRendering} fields={fields} />
       </div>
     );
+  },
+};
+
+export const Collapsed: Story = {
+  render: (args) => {
+    const params = {
+      ...baseParams,
+      ...(args.hasLogo ? { Logo: logoParam } : {}),
+      SimpleLayout: boolToSitecoreCheckbox(args.isSimpleLayout),
+    };
+    const fields = getNavigationFields({ withRoot: args.withRoot, flat: args.isFlat });
+    return <NavigationCollapsed params={params} rendering={baseRendering} fields={fields} />;
   },
 };

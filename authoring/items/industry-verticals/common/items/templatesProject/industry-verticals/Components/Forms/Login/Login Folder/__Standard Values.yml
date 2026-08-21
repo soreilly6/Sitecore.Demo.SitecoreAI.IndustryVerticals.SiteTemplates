@@ -1,0 +1,28 @@
+---
+ID: "12f18a8f-db47-420c-8d34-e33cd6bd00d5"
+Parent: "e1da8cc0-3a11-4966-a4cc-150eb8e9a066"
+Template: "e1da8cc0-3a11-4966-a4cc-150eb8e9a066"
+Path: "/sitecore/templates/Project/industry-verticals/Components/Forms/Login/Login Folder/__Standard Values"
+SharedFields:
+- ID: "1172f251-dad4-4efb-a329-0c63500e4f1e"
+  Hint: __Masters
+  Value: |
+    {999CF789-98DC-4531-ADA8-FE454D99CFEA}
+    {E1DA8CC0-3A11-4966-A4CC-150EB8E9A066}
+- ID: "dbbbeca1-21c7-4906-9dd2-493c1efa59a2"
+  Hint: __Shared revision
+  Value: "da8d8ba5-4731-4de9-a4cb-105e00a562c5"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260821T160200Z
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "e1da8cc0-3a11-4966-a4cc-150eb8e9a066"
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260821T160200Z

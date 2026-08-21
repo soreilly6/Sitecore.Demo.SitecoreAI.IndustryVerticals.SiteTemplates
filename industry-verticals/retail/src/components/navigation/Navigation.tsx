@@ -35,6 +35,7 @@ interface NavigationListItemProps {
   handleClick: (event?: React.MouseEvent<HTMLElement>) => void;
   logoSrc?: string;
   isSimpleLayout?: boolean;
+  isAlwaysCollapsed?: boolean;
 }
 
 export interface NavigationProps extends ComponentProps {
@@ -73,7 +74,6 @@ const SideOpeningMegaPanel: React.FC<{
   isOpen: boolean;
   handleLinkClick: (event?: React.MouseEvent<HTMLElement>) => void;
 }> = ({ sections, isOpen, handleLinkClick }) => {
-  const { page } = useSitecore();
   const firstSectionId = sections[0]?.Id ?? '';
   const [pathIds, setPathIds] = useState<string[]>(() => (firstSectionId ? [firstSectionId] : []));
 
@@ -100,7 +100,7 @@ const SideOpeningMegaPanel: React.FC<{
         <span className="text-foreground font-medium">{getLinkContent(focusNode)}</span>
         <Link
           field={getLinkField(focusNode)}
-          editable={page.mode.isEditing}
+          editable={false}
           onClick={handleLinkClick}
           className="text-foreground/70 hover:text-foreground whitespace-nowrap underline-offset-4 hover:underline"
         >
@@ -137,7 +137,7 @@ const SideOpeningMegaPanel: React.FC<{
                   ) : (
                     <Link
                       field={getLinkField(section)}
-                      editable={page.mode.isEditing}
+                      editable={false}
                       onClick={handleLinkClick}
                       onMouseEnter={() => selectAtColumn(colIndex, section)}
                       onFocus={() => selectAtColumn(colIndex, section)}
@@ -165,8 +165,8 @@ const NavigationListItem: React.FC<NavigationListItemProps> = ({
   handleClick,
   logoSrc,
   isSimpleLayout,
+  isAlwaysCollapsed,
 }) => {
-  const { page } = useSitecore();
   const [isActive, setIsActive] = useState(false);
 
   const dropdownRef = useRef<HTMLLIElement>(null);
@@ -191,6 +191,7 @@ const NavigationListItem: React.FC<NavigationListItemProps> = ({
           fields={child}
           handleClick={clickHandler}
           isSimpleLayout={isSimpleLayout}
+          isAlwaysCollapsed={isAlwaysCollapsed}
           logoSrc={logoSrc}
         />
       ))
@@ -198,13 +199,18 @@ const NavigationListItem: React.FC<NavigationListItemProps> = ({
 
   const dropdownShellClasses = hasDropdownMenu
     ? clsx(
-        'navigation-dropdown-panel z-110 text-base max-lg:border-b max-lg:pb-4 max-lg:text-sm',
-        'lg:absolute lg:top-full lg:transition-all lg:duration-300',
-        'lg:bg-background lg:rounded-xl lg:shadow-md',
-        'lg:left-0 lg:translate-x-0 lg:p-0',
-        isActive
-          ? 'max-lg:flex max-lg:flex-col'
-          : 'max-lg:hidden lg:pointer-events-none lg:translate-y-2 lg:scale-95 lg:opacity-0'
+        'navigation-dropdown-panel z-110 text-base',
+        isAlwaysCollapsed
+          ? clsx('border-b pb-4 text-sm', isActive ? 'flex flex-col' : 'hidden')
+          : clsx(
+              'max-lg:border-b max-lg:pb-4 max-lg:text-sm',
+              'lg:absolute lg:top-full lg:transition-all lg:duration-300',
+              'lg:bg-background lg:rounded-xl lg:shadow-md',
+              'lg:left-0 lg:translate-x-0 lg:p-0',
+              isActive
+                ? 'max-lg:flex max-lg:flex-col'
+                : 'max-lg:hidden lg:pointer-events-none lg:translate-y-2 lg:scale-95 lg:opacity-0'
+            )
       )
     : undefined;
 
@@ -216,15 +222,15 @@ const NavigationListItem: React.FC<NavigationListItemProps> = ({
       className={clsx(
         fields?.Styles?.join(' '),
         'relative flex flex-col gap-x-8 gap-y-4 xl:gap-x-14',
-        isRootItem && 'lg:flex-row',
-        isLogoRootItem && 'shrink-0 max-lg:hidden',
-        isLogoRootItem && isSimpleLayout && 'lg:mr-auto'
+        isRootItem && !isAlwaysCollapsed && 'lg:flex-row',
+        isLogoRootItem && (isAlwaysCollapsed ? 'hidden' : 'shrink-0 max-lg:hidden'),
+        isLogoRootItem && isSimpleLayout && !isAlwaysCollapsed && 'lg:mr-auto'
       )}
     >
       <div className="flex items-center justify-center gap-1">
         <Link
           field={getLinkField(fields)}
-          editable={page.mode.isEditing}
+          editable={false}
           onClick={clickHandler}
           className="hover:text-foreground-light whitespace-nowrap transition-colors"
         >
@@ -259,15 +265,20 @@ const NavigationListItem: React.FC<NavigationListItemProps> = ({
         <div data-navigation-dropdown className={dropdownShellClasses}>
           <ul
             role="menu"
-            className="flex flex-col items-center gap-x-8 gap-y-4 max-lg:w-full lg:hidden xl:gap-x-14"
+            className={clsx(
+              'flex flex-col items-center gap-x-8 gap-y-4 xl:gap-x-14',
+              isAlwaysCollapsed ? 'w-full' : 'max-lg:w-full lg:hidden'
+            )}
           >
             {children}
           </ul>
-          <SideOpeningMegaPanel
-            sections={fields.Children!}
-            isOpen={isActive}
-            handleLinkClick={clickHandler}
-          />
+          {!isAlwaysCollapsed && (
+            <SideOpeningMegaPanel
+              sections={fields.Children!}
+              isOpen={isActive}
+              handleLinkClick={clickHandler}
+            />
+          )}
         </div>
       )}
       {hasChildren && !hasDropdownMenu && (
@@ -276,7 +287,7 @@ const NavigationListItem: React.FC<NavigationListItemProps> = ({
           data-navigation-dropdown
           className={clsx(
             'flex flex-col items-center gap-x-8 gap-y-4 xl:gap-x-14',
-            isRootItem && 'lg:flex-row',
+            isRootItem && !isAlwaysCollapsed && 'lg:flex-row',
             hasDropdownMenu && dropdownShellClasses
           )}
         >
@@ -287,7 +298,16 @@ const NavigationListItem: React.FC<NavigationListItemProps> = ({
   );
 };
 
-export const Default = ({ params, fields }: NavigationProps) => {
+/**
+ * Horizontal navigation with a hamburger overlay below `lg`, or at every viewport when collapsed.
+ * @param {NavigationProps & { isAlwaysCollapsed?: boolean }} props - Sitecore nav props and collapse mode.
+ * @returns {JSX.Element} The navigation bar.
+ */
+const NavigationMenu = ({
+  params,
+  fields,
+  isAlwaysCollapsed = false,
+}: NavigationProps & { isAlwaysCollapsed?: boolean }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { page } = useSitecore();
   const { styles, RenderingIdentifier: id, Logo: logoImage, SimpleLayout: simpleLayout } = params;
@@ -296,7 +316,7 @@ export const Default = ({ params, fields }: NavigationProps) => {
 
   if (!Object.values(fields).some((v) => !!v)) {
     return (
-      <div className={`component navigation ${styles}`} id={id}>
+      <div className={`component navigation ${styles}`} id={id} suppressHydrationWarning>
         <div className="component-content">[Navigation]</div>
       </div>
     );
@@ -324,16 +344,25 @@ export const Default = ({ params, fields }: NavigationProps) => {
         handleClick={(event) => handleToggleMenu(event, false)}
         logoSrc={logoSrc}
         isSimpleLayout={!!isSimpleLayout}
+        isAlwaysCollapsed={isAlwaysCollapsed}
       />
     ));
 
   return (
-    <div className={`component navigation bg-background ${styles}`} id={id}>
+    <div
+      className={`component navigation bg-background ${styles}`}
+      id={id}
+      suppressHydrationWarning
+    >
       <div
         className={clsx(
-          'relative z-150 container flex items-center py-4 lg:hidden',
+          'relative z-150 container flex items-center py-4',
+          !isAlwaysCollapsed && 'lg:hidden',
+          !isSimpleLayout && '[.component.header_&]:grid-cols-2 [.component.header_&]:px-0',
           !isSimpleLayout &&
-            '[.component.header_&]:grid-cols-2 [.component.header_&]:px-0 [.component.header_&]:max-lg:grid',
+            (isAlwaysCollapsed
+              ? '[.component.header_&]:grid'
+              : '[.component.header_&]:max-lg:grid'),
           !isSimpleLayout ? 'flex-row-reverse' : '',
           isSimpleLayout && !hasLogoRootItem ? 'justify-end' : 'justify-between'
         )}
@@ -341,7 +370,7 @@ export const Default = ({ params, fields }: NavigationProps) => {
         {hasLogoRootItem && (
           <Link
             field={getLinkField(rootItem!)}
-            editable={page.mode.isEditing}
+            editable={false}
             className={clsx(
               'navigation-mobile-trigger',
               !isSimpleLayout && '[.component.header_&]:mx-auto'
@@ -369,15 +398,19 @@ export const Default = ({ params, fields }: NavigationProps) => {
       <nav
         className={clsx(
           'bg-background z-100 flex duration-300',
-          'max-lg:fixed max-lg:inset-0',
-          !isMenuOpen && 'max-lg:-translate-y-full max-lg:opacity-0'
+          isAlwaysCollapsed ? 'fixed inset-0' : 'max-lg:fixed max-lg:inset-0',
+          !isMenuOpen &&
+            (isAlwaysCollapsed
+              ? 'pointer-events-none -translate-y-full opacity-0'
+              : 'max-lg:-translate-y-full max-lg:opacity-0')
         )}
       >
         <ul
           role="menubar"
           className={clsx(
-            'container flex flex-col items-center justify-center gap-x-8 gap-y-4 py-6 text-lg lg:flex-row xl:gap-x-16',
-            isSimpleLayout && !hasLogoRootItem && 'lg:justify-end'
+            'container flex flex-col items-center justify-center gap-x-8 gap-y-4 py-6 text-lg',
+            !isAlwaysCollapsed && 'lg:flex-row xl:gap-x-16',
+            isSimpleLayout && !hasLogoRootItem && !isAlwaysCollapsed && 'lg:justify-end'
           )}
         >
           {navigationItems}
@@ -386,6 +419,17 @@ export const Default = ({ params, fields }: NavigationProps) => {
     </div>
   );
 };
+
+export const Default = (props: NavigationProps) => <NavigationMenu {...props} />;
+
+/**
+ * Same hamburger overlay as Default on tablet and mobile, kept at every viewport.
+ * @param {NavigationProps} props - Sitecore navigation rendering props.
+ * @returns {JSX.Element} The always-collapsed navigation.
+ */
+export const Collapsed = (props: NavigationProps) => (
+  <NavigationMenu {...props} isAlwaysCollapsed />
+);
 
 /** Plain-text label for a nav item, for use in aria attributes. */
 const getNavItemLabel = (fields: NavItemFields): string =>
@@ -399,7 +443,6 @@ const VerticalNavListItem: React.FC<{
   fields: NavItemFields;
   currentPath: string;
 }> = ({ fields, currentPath }) => {
-  const { page } = useSitecore();
   const children = fields.Children ?? [];
   const isCurrent = !!fields.Href && fields.Href === currentPath;
   const [isOpen, setIsOpen] = useState(() => navItemContainsPath(fields, currentPath));
@@ -410,7 +453,7 @@ const VerticalNavListItem: React.FC<{
       <div className="flex items-center justify-between gap-2">
         <Link
           field={getLinkField(fields)}
-          editable={page.mode.isEditing}
+          editable={false}
           aria-current={isCurrent ? 'page' : undefined}
           className={clsx(
             'flex-1 py-2 transition-colors',
@@ -455,7 +498,7 @@ export const VerticalNav = ({ params, fields }: NavigationProps) => {
 
   if (!Object.values(fields).some((v) => !!v)) {
     return (
-      <div className={`component navigation ${styles}`} id={id}>
+      <div className={`component navigation ${styles}`} id={id} suppressHydrationWarning>
         <div className="component-content">[Navigation]</div>
       </div>
     );
@@ -465,7 +508,11 @@ export const VerticalNav = ({ params, fields }: NavigationProps) => {
   const preparedFields = prepareFields(fields, false);
 
   return (
-    <div className={`component navigation navigation-vertical ${styles}`} id={id}>
+    <div
+      className={`component navigation navigation-vertical ${styles}`}
+      id={id}
+      suppressHydrationWarning
+    >
       <nav>
         <ul role="menubar" className="flex flex-col">
           {Object.values(preparedFields)
