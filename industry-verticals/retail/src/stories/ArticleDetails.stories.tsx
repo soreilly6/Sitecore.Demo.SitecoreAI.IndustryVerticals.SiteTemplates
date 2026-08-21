@@ -4,6 +4,7 @@ import {
   Default as ArticleDetails,
   NoImage as ArticleDetailsNoImage,
   FullDetails as ArticleDetailsFullDetails,
+  MedicalArticle as ArticleDetailsMedicalArticle,
 } from '../components/article-details/ArticleDetails';
 import { CommonParams, CommonRendering } from './common/commonData';
 import { renderStorybookPlaceholder } from './helpers/renderStorybookPlaceholder';
@@ -144,6 +145,36 @@ export const FullDetails: Story = {
         params={params}
         rendering={baseRendering}
         fields={fullDetailsFields}
+      />
+    );
+  },
+};
+
+const medicalArticleRendering = {
+  ...baseRendering,
+  placeholders: {
+    ...baseRendering.placeholders,
+    [`article-details-sidebar-${baseParams.DynamicPlaceholderId}`]: [renderStorybookPlaceholder()],
+  },
+};
+
+const medicalArticleFields = {
+  ...baseFields,
+  Conclusion: createRichTextField(1),
+};
+
+export const MedicalArticle: Story = {
+  render: (args) => {
+    const params = {
+      ...baseParams,
+      HideShareWidget: boolToSitecoreCheckbox(args.hideShareWidget),
+    };
+
+    return (
+      <ArticleDetailsMedicalArticle
+        params={params}
+        rendering={medicalArticleRendering}
+        fields={medicalArticleFields}
       />
     );
   },

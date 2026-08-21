@@ -7,7 +7,7 @@ import {
 } from '@sitecore-content-sdk/nextjs/codegen';
 // end of built-in imports
 
-import { Link, Text, useSitecore, RichText, NextImage, Placeholder, Image as Image_8a80e63291fea86e0744df19113dc44bec187216, CdpHelper, withDatasourceCheck, DateField } from '@sitecore-content-sdk/nextjs';
+import { Link, Text, useSitecore, RichText, NextImage, DateField, Placeholder, Image as Image_8a80e63291fea86e0744df19113dc44bec187216, CdpHelper, withDatasourceCheck } from '@sitecore-content-sdk/nextjs';
 import { useMemo, useRef, useState, useEffect, useId, useCallback } from 'react';
 import React from 'react';
 import Head from 'next/head';
@@ -19,6 +19,7 @@ import { isParamEnabled } from '@/helpers/isParamEnabled';
 import AccentLine from '@/assets/icons/accent-line/AccentLine';
 import ProductCarousel from 'src/components/non-sitecore/ProductCarousel';
 import { CommonStyles, LayoutStyles, PromoFlags, HeroBannerStyles } from '@/types/styleFlags';
+import { articleShortDateFormatter, articleDateFormatter } from '@/helpers/dateHelper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation, A11y, Keyboard } from 'swiper/modules';
 import { ArrowRight, ChevronLeft, ChevronRight, ChevronDown, Heart, Plus, Star, User, X, Check, Loader2, LoaderCircle, ShoppingCart, Search, Globe, MoreHorizontal, Home, Clock, Share2 } from 'lucide-react';
@@ -74,12 +75,12 @@ import SuggestionBlock from 'src/components/non-sitecore/search/SuggestionBlock'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shadcn/components/ui/popover';
 import { MiniCart } from 'src/components/non-sitecore/MiniCart';
 import PreviewSearch_938f3b0320996fc3fe6ab3d953daf2e708e085ca from 'src/components/non-sitecore/search/PreviewSearch';
+import { useRouter as useRouter_0e8a928699f624a3ad05eb9c9906b0e7ce1a00be } from 'next/router';
 import HamburgerIcon from '@/components/non-sitecore/HamburgerIcon';
 import { useClickAway } from '@/hooks/useClickAway';
 import { useStopResponsiveTransition } from '@/hooks/useStopResponsiveTransition';
 import { extractMediaUrl } from '@/helpers/extractMediaUrl';
 import { getLinkContent, getLinkField, isNavLevel, isNavRootItem, prepareFields } from '@/helpers/navHelpers';
-import { useRouter as useRouter_0e8a928699f624a3ad05eb9c9906b0e7ce1a00be } from 'next/router';
 import { Select as Select_4a7098778d43a9b4dcd5871ec48ea51b5a246850, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'src/shadcn/components/ui/select';
 import { localeOptions } from '@/constants/localeOptions';
 import { generateIndexes } from '@/helpers/generateIndexes';
@@ -90,7 +91,6 @@ import { pageView } from '@sitecore-cloudsdk/events/browser';
 import config from 'sitecore.config';
 import { faUser, faCalendar, faTag } from '@fortawesome/free-solid-svg-icons';
 import { sortByDateDesc, getCategoryCounts } from '@/helpers/articleUtils';
-import { articleDateFormatter } from '@/helpers/dateHelper';
 
 const importMap = [
   {
@@ -101,11 +101,11 @@ const importMap = [
       { name: 'useSitecore', value: useSitecore },
       { name: 'RichText', value: RichText },
       { name: 'NextImage', value: NextImage },
+      { name: 'DateField', value: DateField },
       { name: 'Placeholder', value: Placeholder },
       { name: 'Image', value: Image_8a80e63291fea86e0744df19113dc44bec187216 },
       { name: 'CdpHelper', value: CdpHelper },
       { name: 'withDatasourceCheck', value: withDatasourceCheck },
-      { name: 'DateField', value: DateField },
     ]
   },
   {
@@ -183,6 +183,13 @@ const importMap = [
       { name: 'LayoutStyles', value: LayoutStyles },
       { name: 'PromoFlags', value: PromoFlags },
       { name: 'HeroBannerStyles', value: HeroBannerStyles },
+    ]
+  },
+  {
+    module: '@/helpers/dateHelper',
+    exports: [
+      { name: 'articleShortDateFormatter', value: articleShortDateFormatter },
+      { name: 'articleDateFormatter', value: articleDateFormatter },
     ]
   },
   {
@@ -581,6 +588,12 @@ const importMap = [
     ]
   },
   {
+    module: 'next/router',
+    exports: [
+      { name: 'useRouter', value: useRouter_0e8a928699f624a3ad05eb9c9906b0e7ce1a00be },
+    ]
+  },
+  {
     module: '@/components/non-sitecore/HamburgerIcon',
     exports: [
       { name: 'default', value: HamburgerIcon },
@@ -612,12 +625,6 @@ const importMap = [
       { name: 'isNavLevel', value: isNavLevel },
       { name: 'isNavRootItem', value: isNavRootItem },
       { name: 'prepareFields', value: prepareFields },
-    ]
-  },
-  {
-    module: 'next/router',
-    exports: [
-      { name: 'useRouter', value: useRouter_0e8a928699f624a3ad05eb9c9906b0e7ce1a00be },
     ]
   },
   {
@@ -685,12 +692,6 @@ const importMap = [
     exports: [
       { name: 'sortByDateDesc', value: sortByDateDesc },
       { name: 'getCategoryCounts', value: getCategoryCounts },
-    ]
-  },
-  {
-    module: '@/helpers/dateHelper',
-    exports: [
-      { name: 'articleDateFormatter', value: articleDateFormatter },
     ]
   }
 ] as ImportEntry[];
