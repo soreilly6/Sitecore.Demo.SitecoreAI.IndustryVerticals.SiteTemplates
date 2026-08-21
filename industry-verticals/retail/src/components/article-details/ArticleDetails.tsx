@@ -335,3 +335,91 @@ export const FullDetails = ({ params, fields, rendering }: ArticleDetailsProps) 
     </>
   );
 };
+
+export const MedicalArticle = ({ params, fields, rendering }: ArticleDetailsProps) => {
+  const { page } = useSitecore();
+  const currentUrl = useCurrentUrl();
+  const { styles, RenderingIdentifier: id, DynamicPlaceholderId } = params;
+  const placeholderKey = `article-details-${DynamicPlaceholderId}`;
+  const sidebarPlaceholderKey = `article-details-sidebar-${DynamicPlaceholderId}`;
+  const fullWidthPlaceholderKey = `article-details-full-width-${DynamicPlaceholderId}`;
+  const isPageEditing = page.mode.isEditing;
+  const hideShareWidget = isParamEnabled(params.HideShareWidget);
+
+  if (!fields) {
+    return isPageEditing ? (
+      <div className={`component article-details ${styles}`} id={id}>
+        [ARTICLE DETAILS]
+      </div>
+    ) : (
+      <></>
+    );
+  }
+
+  return (
+    <>
+      <ArticleOpenGraphTags fields={fields} currentUrl={currentUrl} />
+
+      <article className={`component article-details ${styles}`} id={id}>
+        <div className="container py-11">
+          <div className="bg-foreground relative isolate overflow-hidden rounded-lg">
+            <div className="aspect-[4/3] w-full sm:aspect-[16/9] lg:aspect-[21/9]">
+              <ContentSdkImage field={fields?.Image} className="image-cover" />
+            </div>
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+
+            <div className="absolute inset-x-0 bottom-0 p-6 md:p-12">
+              <h1 className="text-background max-w-4xl">
+                <ContentSdkText field={fields.Title} />
+              </h1>
+              {/* Sized in `ch` so the rule stays as wide as the title's first letter across the heading's responsive scale */}
+              <span
+                aria-hidden="true"
+                className="bg-background-accent mt-5 block h-1.5 w-[1ch] rounded-full text-5xl lg:text-6xl"
+              />
+            </div>
+          </div>
+
+          <div className="mt-12 grid grid-cols-12 gap-x-8 gap-y-12 lg:gap-x-16">
+            <div className="col-span-12 lg:col-span-8 lg:px-8 xl:px-16">
+              <p className="text-accent text-xl font-semibold tracking-wide">
+                <ContentSdkText field={fields.ShortDescription} />
+              </p>
+
+              <div className="rich-text mt-10 text-lg">
+                <ContentSdkRichText field={fields.Content} />
+              </div>
+
+              <div className="mt-12">
+                <Placeholder name={placeholderKey} rendering={rendering} />
+              </div>
+
+              {(fields.Conclusion?.value || isPageEditing) && (
+                <div className="rich-text mt-12 text-lg">
+                  <ContentSdkRichText field={fields.Conclusion} />
+                </div>
+              )}
+            </div>
+
+            <aside className="col-span-12 lg:col-span-4">
+              <div className="space-y-8 lg:sticky lg:top-8">
+                {!hideShareWidget && (
+                  <ShareToggle
+                    url={currentUrl}
+                    title={fields?.Title?.value || ''}
+                    description={fields?.ShortDescription?.value || ''}
+                    mediaUrl={fields?.Image?.value?.src || ''}
+                  />
+                )}
+
+                <Placeholder name={sidebarPlaceholderKey} rendering={rendering} />
+              </div>
+            </aside>
+          </div>
+        </div>
+        <Placeholder name={fullWidthPlaceholderKey} rendering={rendering} />
+      </article>
+    </>
+  );
+};

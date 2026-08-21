@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/router';
 import { Link, TextField, useSitecore } from '@sitecore-content-sdk/nextjs';
 import { ComponentProps } from 'lib/component-props';
 import { ChevronDown, ChevronRight } from 'lucide-react';
@@ -380,6 +381,98 @@ export const Default = ({ params, fields }: NavigationProps) => {
           )}
         >
           {navigationItems}
+        </ul>
+      </nav>
+    </div>
+  );
+};
+
+/** Plain-text label for a nav item, for use in aria attributes. */
+const getNavItemLabel = (fields: NavItemFields): string =>
+  String(fields.NavigationTitle?.value ?? fields.Title?.value ?? fields.DisplayName ?? '');
+
+/** Whether a nav item or any of its descendants points at the given path. */
+const navItemContainsPath = (fields: NavItemFields, path: string): boolean =>
+  fields.Href === path || (fields.Children ?? []).some((child) => navItemContainsPath(child, path));
+
+const VerticalNavListItem: React.FC<{
+  fields: NavItemFields;
+  currentPath: string;
+}> = ({ fields, currentPath }) => {
+  const { page } = useSitecore();
+  const children = fields.Children ?? [];
+  const isCurrent = !!fields.Href && fields.Href === currentPath;
+  const [isOpen, setIsOpen] = useState(() => navItemContainsPath(fields, currentPath));
+  const label = getNavItemLabel(fields);
+
+  return (
+    <li className={clsx(fields?.Styles?.join(' '), 'flex flex-col')}>
+      <div className="flex items-center justify-between gap-2">
+        <Link
+          field={getLinkField(fields)}
+          editable={page.mode.isEditing}
+          aria-current={isCurrent ? 'page' : undefined}
+          className={clsx(
+            'flex-1 py-2 transition-colors',
+            isCurrent ? 'text-accent font-semibold' : 'text-foreground-light hover:text-foreground'
+          )}
+        >
+          {getLinkContent(fields)}
+        </Link>
+
+        {!!children.length && (
+          <button
+            type="button"
+            aria-expanded={isOpen}
+            aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${label}`}
+            onClick={() => setIsOpen((open) => !open)}
+            className="text-foreground-light hover:text-foreground shrink-0 p-1"
+          >
+            <ChevronDown
+              className={clsx(
+                'navigation-vertical-trigger size-4 transition-transform duration-300',
+                isOpen && 'rotate-180'
+              )}
+            />
+          </button>
+        )}
+      </div>
+
+      {!!children.length && isOpen && (
+        <ul role="menu" className="border-border ml-2 flex flex-col border-l pl-4">
+          {children.map((child) => (
+            <VerticalNavListItem key={child.Id} fields={child} currentPath={currentPath} />
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+};
+
+export const VerticalNav = ({ params, fields }: NavigationProps) => {
+  const router = useRouter();
+  const { styles, RenderingIdentifier: id } = params;
+
+  if (!Object.values(fields).some((v) => !!v)) {
+    return (
+      <div className={`component navigation ${styles}`} id={id}>
+        <div className="component-content">[Navigation]</div>
+      </div>
+    );
+  }
+
+  const currentPath = router?.asPath?.split(/[?#]/)[0] ?? '';
+  const preparedFields = prepareFields(fields, false);
+
+  return (
+    <div className={`component navigation navigation-vertical ${styles}`} id={id}>
+      <nav>
+        <ul role="menubar" className="flex flex-col">
+          {Object.values(preparedFields)
+            .filter((item): item is NavItemFields => !!item)
+            .map((item) => (
+              <VerticalNavListItem key={item.Id} fields={item} currentPath={currentPath} />
+            ))}
         </ul>
       </nav>
     </div>

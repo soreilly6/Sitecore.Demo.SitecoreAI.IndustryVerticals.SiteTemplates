@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, waitFor } from 'storybook/test';
-import { Default as Navigation } from '../components/navigation/Navigation';
+import {
+  Default as Navigation,
+  VerticalNav as NavigationVertical,
+} from '../components/navigation/Navigation';
 import { ComponentProps } from 'react';
 import { CommonParams, CommonRendering } from './common/commonData';
 import { getNavigationFields, logoParam } from './constants/navFields';
@@ -147,5 +150,24 @@ export const Simple: Story = {
     };
     const fields = getNavigationFields({ withRoot: args.withRoot, flat: args.isFlat });
     return <Navigation params={params} rendering={baseRendering} fields={fields} />;
+  },
+};
+
+export const Vertical: Story = {
+  args: {
+    withRoot: true,
+    isFlat: false,
+    hasLogo: false,
+    isSimpleLayout: false,
+  },
+  // The shared play asserts header chrome (hamburger, dropdown) that this variant intentionally omits.
+  play: async () => {},
+  render: (args) => {
+    const fields = getNavigationFields({ withRoot: args.withRoot, flat: args.isFlat });
+    return (
+      <div className="max-w-xs p-6">
+        <NavigationVertical params={baseParams} rendering={baseRendering} fields={fields} />
+      </div>
+    );
   },
 };
